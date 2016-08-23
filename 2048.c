@@ -143,10 +143,24 @@ int generatenew(){
 	*ptr = r;
 }
 
+int print(){
+	int i;
+	for(i = 0; i < 16;i++){
+		printf("%d    \n",basearray[i] );
+		if(i%4 == 3){
+			printf("\n");
+			printf("\n");
+		}
+	}
+	return 0;
+}
+
 int main() {
    /* my first program in C */
    	
 	srand(time(NULL));
-
+	generatenew();
+	generatenew();
+	
    	return 0;
 }
