@@ -14,19 +14,6 @@ int basearray[16];
 ---------------
 */
 
-int rightbased[16];
-/*
----------------
-3 | 2 | 1 | 0
----------------
-7 | 6 | 5 | 4
----------------
-11| 10| 9 | 8
----------------
-15| 14| 13| 12
----------------
-*/
-
 int upbased[16];
 /*
 ---------------
@@ -40,20 +27,7 @@ int upbased[16];
 ---------------
 */
 
-int bottombased[16]
-/*
----------------
-3 | 7 | 11| 15
----------------
-2 | 6 | 10| 14
----------------
-1 | 5 | 9 | 13
----------------
-0|  4 | 8 | 12
----------------
-*/
-
-int empty[14];
+int empty[16];
 int emptynum;
 
 
@@ -72,48 +46,77 @@ int exchange(int* a, int* b){
 	return 0;
 }
 
-int mergeleft(){
+int move(int* array,int direction){
+	int i,j;
+	if(direction == 0){
+		for(i = 0;i<4;i++){
+			if(array[i] == 0){
+				for(j=i+1;j<4;j++){
+					if(array[j] != 0){
+						exchange(array[i],array[j]);
+					}
+				}
+			}
+		}
+	}
+	else{
+		for(i = 3; i>=0;i--){
+			if(array[i] == 0){
+				for(j = i-1;j>=0;j--){
+					if(array[j] != 0){
+						exchange(array[i],array[j]);
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int mergeleft(int* array){
 	int i;
+	
+	move(array,0);
 	for(i=0;i<3;i++){
-		if(basearray[i] == 0){
-			exchange(basearray[i],basearray[i+1]);
+		if(array[i] == array[i+1] && array[i] != 0){
+			array[i] *=2;
+			array[i+1] = 0;
 		}
 	}
+	move(array,0);
+
 	return 0;
 }
 
-int mergeright(){
+int mergeright(int *array){
 	int i;
-	for(i = 3;i>0;i--){
-		if(basearray[i] == 0){
-			exchange(basearray[i],basearray[i-1]);
+	
+	move(array,1);
+	for(i=3;i>0;i--){
+		if(array[i] == array[i-1] && array[i] != 0){
+			array[i] *=2;
+			array[i-1] = 0;
 		}
 	}
+	move(array,1);
+
 	return 0;
 }
 
-int mergeup(){
+int mergeup(int* array){
 	int i;
-	for(i=0;i<3;i++){
-		if(upbased[i] == 0){
-			exchange(upbased[i],upbased[i+1]);
+	
+	move(array,0);
+	for(i=0;i<2;i++){
+		if(array[i] == array[i+1] && array[i] != 0){
+			array[i] *=2;
+			array[i+1] = 0;
 		}
 	}
+	move(array,0);
+
 	return 0;
 }
-
-int mergebottom(){
-	int i;
-	for(i = 3;i>0;i--){
-		if(upbased[i] == 0){
-			exchange(upbased[i],upbased[i-1]);
-		}
-	}
-	return 0;
-}
-
-
-
 
 
 int checkempty(){
@@ -125,6 +128,10 @@ int checkempty(){
 			empty[i] = basearray + i;
 		}
 	}
+	return 0;
+}
+
+int action(char c){
 	return 0;
 }
 
@@ -161,6 +168,16 @@ int main() {
 	srand(time(NULL));
 	generatenew();
 	generatenew();
-	
+	int c = getchar();
+
+    if(c==27)
+    {
+        printf("UP");
+    }
+
+    if(c==28)
+    {
+        printf("DOWN");
+    }
    	return 0;
 }
