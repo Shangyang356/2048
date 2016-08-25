@@ -32,8 +32,8 @@ int upbased[16];
 
 int *empty[16];
 int emptynum;
-
-
+unsigned long score;
+//update the upbased array.
 int update(){
 	int i;
 	for(i = 0; i<16;i++){
@@ -41,7 +41,7 @@ int update(){
 	}
 	return 0;
 }
-
+//exchange two varialbes' values
 int exchange(int* a, int* b){
 	int temp = *a;
 	*a = *b;
@@ -49,6 +49,9 @@ int exchange(int* a, int* b){
 	return 0;
 }
 
+
+//direction is 0 when press up and left, 1 when press down and right.
+//move one column/row that all the elements stick together.
 int move(int* array,int direction){
 	int i,j;
 	if(direction == 0){
@@ -100,6 +103,7 @@ int mergeright(int *array){
 	for(i=3;i>0;i--){
 		if(array[i] == array[i-1] && array[i] != 0){
 			array[i] *=2;
+			score += array[i];
 			array[i-1] = 0;
 		}
 	}
@@ -110,7 +114,7 @@ int mergeright(int *array){
 
 
 
-
+/*update the number of empty slots and collect all of their pointers in one array.*/
 int checkempty(){
 	int i;
 	emptynum = 0;
@@ -171,6 +175,7 @@ int action2(){
 }
 */
 
+/*generate a new number in one of empty slot*/
 int generatenew(){
 	int newnum;
 	int r =rand()%2;
@@ -187,6 +192,8 @@ int generatenew(){
 	return 0;
 }
 
+/*print the 4*4 matrix*/
+
 int print(){
 	int i;
 	for(i = 0; i < 16;i++){
@@ -198,13 +205,37 @@ int print(){
 	}
 	return 0;
 }
+//if the game is over return 0 else return 1;
+int checklose(){
+	if(emptynum != 0){
+		return 1;
+	}
+	else{
+		int i,j;
+		for(i = 0;i<4; i++){
+			for(j=0;j<3;j++){
+				if(basearray[j] == basearray[j+1] || upbased[j] == upbased[j+1]){
+					return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int printscore(){
+	printf("your score is %lu\n",score );
+	return 0;
+}
+
 
 int main() {
-   /* my first program in C */
+
    	
 	srand(time(NULL));
 	generatenew();
 	generatenew();
+	score = 0;
 	printf("press a key!\n");
 	action();
    	return 0;
