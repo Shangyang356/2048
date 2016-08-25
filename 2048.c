@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 int basearray[16];
 /*
@@ -27,14 +30,14 @@ int upbased[16];
 ---------------
 */
 
-int empty[16];
+int *empty[16];
 int emptynum;
 
 
-int init(){
+int update(){
 	int i;
 	for(i = 0; i<16;i++){
-		upbased+i = basearray +(i/4 + i%4*4);
+		*(upbased+i) = *(basearray +(i/4 + i%4*4));
 	}
 	return 0;
 }
@@ -53,7 +56,7 @@ int move(int* array,int direction){
 			if(array[i] == 0){
 				for(j=i+1;j<4;j++){
 					if(array[j] != 0){
-						exchange(array[i],array[j]);
+						exchange(array+i,array+j);
 					}
 				}
 			}
@@ -64,7 +67,7 @@ int move(int* array,int direction){
 			if(array[i] == 0){
 				for(j = i-1;j>=0;j--){
 					if(array[j] != 0){
-						exchange(array[i],array[j]);
+						exchange(array+i,array+j);
 					}
 				}
 			}
@@ -73,6 +76,7 @@ int move(int* array,int direction){
 	return 0;
 }
 
+//merge column/row from left or up.
 int mergeleft(int* array){
 	int i;
 	
@@ -88,6 +92,7 @@ int mergeleft(int* array){
 	return 0;
 }
 
+//merge column/row from right or bottom.
 int mergeright(int *array){
 	int i;
 	
@@ -103,20 +108,7 @@ int mergeright(int *array){
 	return 0;
 }
 
-int mergeup(int* array){
-	int i;
-	
-	move(array,0);
-	for(i=0;i<2;i++){
-		if(array[i] == array[i+1] && array[i] != 0){
-			array[i] *=2;
-			array[i+1] = 0;
-		}
-	}
-	move(array,0);
 
-	return 0;
-}
 
 
 int checkempty(){
@@ -131,9 +123,53 @@ int checkempty(){
 	return 0;
 }
 
-int action(char c){
+int action(){
+	int c = getchar();
+	c =getchar();
+	c = getchar();
+	switch(c){
+		case 65:
+			printf("press up!\n");
+			break;
+		case 66:
+			printf("press down!\n");
+			break;
+		case 67:
+			printf("press right!\n");
+			break;
+		case 68:
+			printf("press left!\n");
+			break;
+		}
+
 	return 0;
 }
+/*
+int action2(){
+	if (getch() == '\033') { // if the first value is esc
+    	getch(); // skip the [
+    	switch(getch()) { // the real value
+        	case 'A':
+        		printf("press up!\n");
+            // code for arrow up
+            	break;
+        	case 'B':
+        		printf("press up\\down!\n");
+            // code for arrow down
+            	break;
+        	case 'C':
+        		printf("press right!\n");
+            // code for arrow right
+            	break;
+        	case 'D':
+        		printf("press left!\n");
+            // code for arrow left
+            	break;
+    	}
+	}
+	return 0;
+}
+*/
 
 int generatenew(){
 	int newnum;
@@ -148,6 +184,7 @@ int generatenew(){
 	int r2 = rand() % emptynum;
 	int* ptr = empty[r2];
 	*ptr = r;
+	return 0;
 }
 
 int print(){
@@ -168,16 +205,7 @@ int main() {
 	srand(time(NULL));
 	generatenew();
 	generatenew();
-	int c = getchar();
-
-    if(c==27)
-    {
-        printf("UP");
-    }
-
-    if(c==28)
-    {
-        printf("DOWN");
-    }
+	printf("press a key!\n");
+	action();
    	return 0;
 }
