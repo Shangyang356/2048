@@ -42,6 +42,24 @@ int init(){
 	for(i = 0; i<16;i++){
 		arraya[i] = 0;
 	}
+	/*
+	arraya[0] =4;
+	arraya[1] =2;
+	arraya[2] =16;
+	arraya[3] =64;
+	arraya[4] =8;
+	arraya[5] =4;
+	arraya[6] =2;
+	arraya[7] =4;
+	arraya[8] =4;
+	arraya[9] =8;
+	arraya[10] =4;
+	arraya[11] =2;
+	arraya[12] =2;
+	arraya[13] =16;
+	arraya[14] =2;
+	arraya[15] =4;
+	*/
 	for(i = 0; i<16;i++){
 		basearray[i] =&arraya[i];
 		upbased[i] = &arraya[(i/4 + i%4*4)];
@@ -69,6 +87,7 @@ int moverow(int** array,int direction){
 				for(j=i+1;j<4;j++){
 					if(*array[j] !=0){
 						exchange(array[i],array[j]);
+						j=4;
 					}
 				}
 			}
@@ -77,9 +96,10 @@ int moverow(int** array,int direction){
 	else if(direction == 1){
 		for(i = 3;i >0; i--){
 			if(*array[i] == 0){
-				for(j=i-1;j>0;j++){
+				for(j=i-1;j>=0;j--){
 					if(*array[j] !=0){
 						exchange(array[i],array[j]);
+						j =-1;
 					}
 				}
 			}
@@ -88,21 +108,11 @@ int moverow(int** array,int direction){
 	return 0;
 }
 
-
-
-int move(int** array,int direction){
-	moverow(array,direction);
-	moverow(array+4,direction);
-	moverow(array+8,direction);
-	moverow(array+12,direction);
-	return 0;	
-}
-
 //merge column/row from left or up.
 int mergerowleft(int** array){
 	int i;
 	
-	move(array,0);
+	moverow(array,0);
 	for(i=0;i<3;i++){
 		if(*(array[i]) == *(array[i+1]) && *(array[i]) != 0){
 			*(array[i]) *=2;
@@ -110,7 +120,7 @@ int mergerowleft(int** array){
 			*(array[i+1]) = 0;
 		}
 	}
-	move(array,0);
+	moverow(array,0);
 
 	return 0;
 }
@@ -124,10 +134,10 @@ int mergeleft(int** array){
 }
 
 //merge column/row from right or bottom.
-int mergeright(int **array){
+int mergerowright(int **array){
 	int i;
 	
-	move(array,1);
+	moverow(array,1);
 	for(i=3;i>0;i--){
 		if(*(array[i]) == *(array[i-1]) && *(array[i]) != 0){
 			*(array[i]) *=2;
@@ -135,8 +145,16 @@ int mergeright(int **array){
 			*(array[i-1]) = 0;
 		}
 	}
-	move(array,1);
+	moverow(array,1);
 
+	return 0;
+}
+
+int mergeright(int** array){
+	mergerowright(array);
+	mergerowright(array+4);
+	mergerowright(array+8);
+	mergerowright(array+12);
 	return 0;
 }
 
@@ -166,25 +184,20 @@ int action(){
 
 	if(c == 65){
 		
-		move(upbased,0);
-
-		mergerowleft(upbased);
-		mergerowleft(upbased+4);
-
-
-		printf("press up!\n");
+		mergeleft(upbased);
+		printf("----------------------------up!\n");
 	}
 	else if(c == 66){
-		printf("press down!\n");
+		mergeright(upbased);
+		printf("----------------------------down!\n");
 	}
 	else if(c == 67){
-		printf("press right!\n");
+		mergeright(basearray);
+		printf("----------------------------right!\n");
 	}
 	else if(c == 68){
-		move(basearray,0);
 		mergeleft(basearray);
-		checkempty();
-		printf("press left!\n");
+		printf("----------------------------left!\n");
 	}
 	return 0;
 }
@@ -200,27 +213,19 @@ int testpress(){
 
 //generate a new number in one of empty slot
 int generatenew(){
-	int newnum;
-	int r =rand()%2;
-	if(r==1){
-		newnum = 2;
-	}
-	else{
-		newnum = 4;
-	}
-	checkempty();
-	int i;
-	for(i = 0;i < 16; i++){
-		if(*basearray[i] != 0){
-			printf("%dth in basearray is not empty\n", i+1);
+	if(emptynum != 0){
+		int newnum;
+		int r =rand()%2;
+		if(r==1){
+			newnum = 2;
 		}
+		else{
+			newnum = 4;
+		}
+	
+		int r2 = rand() % emptynum;
+		*(empty[r2]) = newnum;
 	}
-	int r2 = rand() % emptynum;
-	*(empty[r2]) = newnum;
-	printf("empty pos is %ldth and newnum is %d\n",(empty[r2]-basearray[0])+1 ,newnum);
-	emptynum--;
-	printf("emptynum is %d\n",emptynum );
-
 	return 0;
 }
 
@@ -246,7 +251,8 @@ int checklose(){
 		int i,j;
 		for(i = 0;i<4; i++){
 			for(j=0;j<3;j++){
-				if(*(basearray[j]) == *(basearray[j+1]) || *(upbased[j]) == *(upbased[j+1])){
+				if(*(basearray[j+4*i]) == *(basearray[j+1+4*i]) || *(upbased[j+4*i]) == *(upbased[j+1+4*i])){
+
 					return 1;
 				}
 			}
@@ -265,7 +271,10 @@ int printscore(){
 int play(){
 	checkempty();
 	while(checklose() ==1){
+
+		printf("emptynum is %d and checklose is %d\n", emptynum,checklose());
 		action();
+		checkempty();
 		generatenew();
 		printmatrix();
 		
