@@ -43,22 +43,22 @@ int init(){
 		arraya[i] = 0;
 	}
 	/*
-	arraya[0] =4;
+	arraya[0] =0;
 	arraya[1] =2;
-	arraya[2] =16;
-	arraya[3] =64;
-	arraya[4] =8;
-	arraya[5] =4;
-	arraya[6] =2;
-	arraya[7] =4;
-	arraya[8] =4;
-	arraya[9] =8;
-	arraya[10] =4;
+	arraya[2] =4;
+	arraya[3] =8;
+	arraya[4] =0;
+	arraya[5] =0;
+	arraya[6] =4;
+	arraya[7] =8;
+	arraya[8] =0;
+	arraya[9] =0;
+	arraya[10] =8;
 	arraya[11] =2;
-	arraya[12] =2;
-	arraya[13] =16;
-	arraya[14] =2;
-	arraya[15] =4;
+	arraya[12] =0;
+	arraya[13] =4;
+	arraya[14] =8;
+	arraya[15] =16;
 	*/
 	for(i = 0; i<16;i++){
 		basearray[i] =&arraya[i];
@@ -158,7 +158,70 @@ int mergeright(int** array){
 	return 0;
 }
 
+int equalneighboor(int** array,int direction){
+	int i,j;
+	if(direction == 0){
+		for(i = 0;i < 4;i++){
+			for(j = 0;j<3;j++){
+				if((*array[i*4+j] == *array[i*4+j+1])&&(*array[i*4+j] !=0)){
+					return 1;
+				}
+			}
+		}
+	}
+	else{
+		for(i = 0;i<4;i++){
+			for( j = 3;j>0;j--){
+				if((*array[i*4+j] == *array[i*4+j-1])&&(*array[i*4+j] !=0)){
+					return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
 
+int haveempty(int** array,int direction){
+	int i,j,k;
+	if(direction == 0){
+		for(i = 0;i<4;i++){
+			for(j=0;j<3;j++){
+				if(*array[i*4+j] ==0){
+					k = j;
+					j = 3;
+				}
+			}
+			for(j=k+1;j<4;j++){
+				if(*array[i*4+j] !=0){
+					return 1;
+				}
+			}
+		}
+	}
+	else{
+		for(i = 0;i < 4;i++){
+			for(j=3;j>0;j--){
+				if(*array[i*4+j] == 0){
+					k = j;
+					j = 0;
+				}
+			}
+			for(j = k-1;j>=0;j--){
+				if(*array[i*4+j] != 0){
+					
+					return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+int executable(int** array,int direction){
+	int i =haveempty(array,direction);
+	int j =equalneighboor(array,direction);
+	return i||j;
+}
 
 //update the number of empty slots and collect all of their pointers in one array.
 int checkempty(){
@@ -176,40 +239,6 @@ int checkempty(){
 	return 0;
 }
 
-int action(){
-	int c = getchar();
-	while(c == 27 || c == 10 || c == 91){
-		c = getchar();
-	}
-
-	if(c == 65){
-		
-		mergeleft(upbased);
-		printf("----------------------------up!\n");
-	}
-	else if(c == 66){
-		mergeright(upbased);
-		printf("----------------------------down!\n");
-	}
-	else if(c == 67){
-		mergeright(basearray);
-		printf("----------------------------right!\n");
-	}
-	else if(c == 68){
-		mergeleft(basearray);
-		printf("----------------------------left!\n");
-	}
-	return 0;
-}
-
-int testpress(){
-	int c = getchar();
-	while(c == 27 || c == 10 || c == 91){
-		c = getchar();
-	}
-	printf("c is %d\n", c);
-	return 0;
-}
 
 //generate a new number in one of empty slot
 int generatenew(){
@@ -228,6 +257,63 @@ int generatenew(){
 	}
 	return 0;
 }
+
+int action(){
+	int c = getchar();
+	while(c == 27 || c == 10 || c == 91){
+		c = getchar();
+	}
+
+	if(c == 65){
+		if(executable(upbased,0) == 1){
+			mergeleft(upbased);
+			checkempty();
+			generatenew();
+			printf("----------------------------up!\n");
+		}
+		else{
+			printf("cannot do up\n");
+		}
+	}
+	else if(c == 66){
+		if(executable(upbased,1) == 1){
+			mergeright(upbased);
+			checkempty();
+			generatenew();
+			printf("----------------------------down!\n");
+		}
+		else{
+			printf("cannot do down\n");
+		}
+	}
+	else if(c == 67){
+		if(executable(basearray,1) == 1){
+			mergeright(basearray);
+			checkempty();
+			generatenew();
+			printf("----------------------------right!\n");
+		}
+		else{
+			printf("cannot do right\n");
+		}
+	}
+	else if(c == 68){
+		if(executable(basearray,0) == 1){
+			mergeleft(basearray);
+			checkempty();
+			generatenew();
+			printf("----------------------------left!\n");
+		}
+		else{
+			printf("cannot do left\n");
+		}
+	}
+	return 0;
+}
+
+
+
+
 
 //print the 4*4 matrix//
 
@@ -272,10 +358,9 @@ int play(){
 	checkempty();
 	while(checklose() ==1){
 
-		printf("emptynum is %d and checklose is %d\n", emptynum,checklose());
+		
 		action();
-		checkempty();
-		generatenew();
+		
 		printmatrix();
 		
 	}
@@ -283,28 +368,20 @@ int play(){
 	return 0;
 }
 
-int testarray(){
-	int i;
-	for(i = 0;i<16;i++){
-		printf("upper %d is %d\n", i, *upbased[i]);
-		printf("base %d is %d\n", i,*basearray[i]);
-	}
-	return 0;
-}
+
 
 int main() {
 	
 	srand(time(NULL));
 	init();
-	//testarray();
+	
+	checkempty();
 	generatenew();
+	checkempty();
 	generatenew();
+	
 	score = 0;
 	printmatrix();
-	while(0){
-		testpress();
-	}
 	play();
-	//testarray();
    	return 0;
 }
